@@ -1,0 +1,16 @@
+{
+  "brightness": { "top": 0.6, "bottom": 0.3, "rows": 25 },
+  "layers": [
+    { "block": "minecraft:sand" },
+    { "block": "minecraft:dirt", "depth": -2, "chance": 0.25 },
+    { "block": "minecraft:dirt", "depth": -1, "chance": 0.5 },
+    { "block": "minecraft:dirt", "depth": 0, "chance": 0.75 },
+    { "block": "minecraft:dirt", "depth": { "min": 1 } },
+    { "block": "minecraft:stone", "depth": { "min": 5 } },
+    { "block": "minecraft:coal_ore", "depth": 8 },
+    { "block": "minecraft:iron_ore", "depth": 10 },
+    { "blocks": ["minecraft:diamond_ore", "minecraft:redstone_ore"], "depth": 22 },
+    { "block": "minecraft:bedrock", "row": 35 },
+    { "block": "minecraft:bedrock", "depth": { "min": 38 } }
+  ]
+}

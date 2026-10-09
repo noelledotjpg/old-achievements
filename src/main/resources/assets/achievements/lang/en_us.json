@@ -1,0 +1,20 @@
+{
+
+  "advancements.toast.task": "Achievement Get!",
+  "chat.type.advancement.task": "%s has just earned the achievement %s",
+  "advancements.diamonds_to_you.title": "",
+  "chat.type.advancement.goal": "%s has just earned the achievement %s",
+  "achievement.requires.text": "Requires",
+  "advancements.toast.goal": "Achievement Get!",
+  "advancements.toast.challenge": "Achievement Get!",
+  "achievement.unknown": "???",
+  "advancements.getting_an_upgrade.title": "",
+  "advancements.kill_enemy.descr": "",
+  "chat.type.advancement.challenge": "%s has just earned the achievement %s",
+  "gui.achievements": "Achievements",
+  "gui.advancements": "Achievements",
+  "advancements.build_workbench.title": "Benchmaking",
+  "achievement.taken": "Taken!",
+  "advancements.build_workbench.descr": "Craft a workbench with four blocks of wooden planks.",
+  "key.advancements": "Achievement"
+}

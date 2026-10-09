@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.nikohalfkino.achievements.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "achievements.refmap.json",
+  "mixins": [
+    "PlayerAdvancementsMixin"
+  ],
+  "client": [
+    "InventoryScreenMixin"
+  ]
+}

@@ -1,7 +1,7 @@
 package com.nikohalfkino.achievements.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.nikohalfkino.achievements.ClassicAchievementsConfig;
+import com.nikohalfkino.achievements.OldAchievementsConfig;
 import com.nikohalfkino.achievements.layout.AdvancementLayoutConfig;
 import com.nikohalfkino.achievements.layout.AdvancementLayoutEngine;
 import com.nikohalfkino.achievements.render.AchievementRenderer;
@@ -10,6 +10,8 @@ import com.nikohalfkino.achievements.render.EditorOverlay;
 import com.nikohalfkino.achievements.render.TreeView;
 import com.nikohalfkino.achievements.state.AdvancementStateHelper;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -42,7 +44,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
         this.clientAdvancements = clientAdvancements;
         this.pages = new AdvancementPages(clientAdvancements, stateHelper);
         this.editor = new NodeEditor(layoutEngine, layoutConfig, stateHelper, scroll);
-        this.renderer = new AchievementRenderer(Minecraft.getInstance().font, stateHelper);
+        this.renderer = new AchievementRenderer(Minecraft.getInstance().font, stateHelper, id -> Minecraft.getInstance().getConnection().getAdvancements().get(id));
     }
 
     private FrameGeometry frame() {
@@ -78,7 +80,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
                         .bounds(frame.left() + frame.width() - 115, frame.top() + frame.height() - 28, 100, 20)
                         .build());
 
-        if (pages.count() > 1 && !ClassicAchievementsConfig.HIDE_PAGE.get()) {
+        if (pages.count() > 1 && !OldAchievementsConfig.HIDE_PAGE.get()) {
             addRenderableWidget(
                     Button.builder(pages.currentName(), button -> {
                         pages.next();
@@ -90,7 +92,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
     }
 
     private void updateLayout() {
-        layoutEngine.buildLayout(pages.current());
+        layoutEngine.buildLayout(pages.current().value());
         centerOnRoot();
     }
 
@@ -111,7 +113,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
         stateHelper.setDebugReveal(editor.isActive());
         pages.refreshKeepingPage();
         rebuildButtons();
-        layoutEngine.buildLayout(pages.current());
+        layoutEngine.buildLayout(pages.current().value());
         scroll.clampTarget(layoutEngine);
     }
 
@@ -128,7 +130,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
         boolean ctrl = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
         boolean shift = (modifiers & GLFW.GLFW_MOD_SHIFT) != 0;
 
-        if (keyCode == GLFW.GLFW_KEY_D && ctrl && shift && ClassicAchievementsConfig.DEBUG_MODE.get()) {
+        if (keyCode == GLFW.GLFW_KEY_D && ctrl && shift && OldAchievementsConfig.DEBUG_MODE.get()) {
             toggleEditor();
             return true;
         }
@@ -147,9 +149,9 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double ScrollY) {
         FrameGeometry frame = frame();
-        scroll.zoomBy(delta, frame.viewportW(), frame.viewportH());
+        scroll.zoomBy(ScrollY, frame.viewportW(), frame.viewportH());
         return true;
     }
 
@@ -210,8 +212,6 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         scroll.animate();
         FrameGeometry frame = frame();
-
-        if (!frame.fullscreen()) renderBackground(g);
 
         Advancement hovered = renderViewport(g, frame, mouseX, mouseY);
         renderFrameAndTitle(g, frame);
@@ -277,9 +277,9 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
         }
 
         String title = Component.translatable("gui.achievements").getString();
-        if (ClassicAchievementsConfig.SHOW_ACHIEVEMENT_COUNT.get()) {
+        if (OldAchievementsConfig.SHOW_ACHIEVEMENT_COUNT.get()) {
             AdvancementStateHelper.AchievementCount count =
-                    stateHelper.countAchievements(clientAdvancements.getAdvancements().getAllAdvancements());
+                    stateHelper.countAchievements(clientAdvancements.getTree().nodes().stream().map(advancementNode -> advancementNode.holder().value()).toList());
             title += " - " + count.unlocked() + "/" + count.total();
         }
 
@@ -294,7 +294,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
     private void renderStatusLines(GuiGraphics g, FrameGeometry frame) {
         int y = frame.top() + frame.height() + 4;
 
-        if (!frame.fullscreen() && ClassicAchievementsConfig.SHOW_HINTS.get()) {
+        if (!frame.fullscreen() && OldAchievementsConfig.SHOW_HINTS.get()) {
             int totalWidth = HINT_GAP * (HINTS.length - 1);
             for (String hint : HINTS) totalWidth += font.width(hint);
 
@@ -315,30 +315,30 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
     }
 
     @Override
-    public void onUpdateAdvancementProgress(Advancement advancement, AdvancementProgress progress) {
-        stateHelper.onProgress(advancement, progress);
+    public void onUpdateAdvancementProgress(AdvancementNode advancement, AdvancementProgress progress) {
+        stateHelper.onProgress(advancement.advancement(), progress);
     }
 
     @Override
-    public void onSelectedTabChanged(Advancement advancement) {}
+    public void onSelectedTabChanged(AdvancementHolder advancement) {}
 
     @Override
-    public void onAddAdvancementRoot(Advancement advancement) {
+    public void onAddAdvancementRoot(AdvancementNode advancement) {
         pages.refresh();
         updateLayout();
     }
 
     @Override
-    public void onRemoveAdvancementRoot(Advancement advancement) {
+    public void onRemoveAdvancementRoot(AdvancementNode advancement) {
         pages.refresh();
         updateLayout();
     }
 
     @Override
-    public void onAddAdvancementTask(Advancement advancement) {}
+    public void onAddAdvancementTask(AdvancementNode advancement) {}
 
     @Override
-    public void onRemoveAdvancementTask(Advancement advancement) {}
+    public void onRemoveAdvancementTask(AdvancementNode advancement) {}
 
     @Override
     public void onAdvancementsCleared() {

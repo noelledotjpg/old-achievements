@@ -2,11 +2,13 @@ package com.nikohalfkino.achievements.render;
 
 import com.nikohalfkino.achievements.state.AdvancementStateHelper;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Set;
+import java.util.function.Function;
 
 public class AchievementRenderer {
 
@@ -16,11 +18,11 @@ public class AchievementRenderer {
     private final EditorOverlayRenderer overlays;
     private final TooltipRenderer tooltips;
 
-    public AchievementRenderer(Font font, AdvancementStateHelper stateHelper) {
-        connectors = new ConnectorRenderer(stateHelper);
+    public AchievementRenderer(Font font, AdvancementStateHelper stateHelper, Function<ResourceLocation, AdvancementHolder> advHolderFunction) {
+        connectors = new ConnectorRenderer(stateHelper, advHolderFunction);
         nodes = new NodeRenderer(stateHelper);
-        overlays = new EditorOverlayRenderer(font, stateHelper);
-        tooltips = new TooltipRenderer(font, stateHelper);
+        overlays = new EditorOverlayRenderer(font, stateHelper, advHolderFunction);
+        tooltips = new TooltipRenderer(font, stateHelper, advHolderFunction);
     }
 
     public void close() {

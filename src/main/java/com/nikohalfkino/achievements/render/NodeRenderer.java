@@ -2,7 +2,7 @@ package com.nikohalfkino.achievements.render;
 
 import com.nikohalfkino.achievements.state.AdvancementStateHelper;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.FrameType;
+import net.minecraft.advancements.AdvancementType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
@@ -39,12 +39,12 @@ final class NodeRenderer {
             int depth = stateHelper.getRequirementCount(advancement);
             float brightness = done ? 1.0F : (canUnlock ? 0.4F : (depth == 2 ? 0.2F : 0.1F));
 
-            boolean challenge = advancement.getDisplay().getFrame() == FrameType.CHALLENGE;
+            boolean challenge = advancement.display().get().getType() == AdvancementType.CHALLENGE;
             ResourceLocation iconBackground = AchievementTextures.iconBackground(challenge, treeComplete);
             g.setColor(brightness, brightness, brightness, 1);
             g.blit(iconBackground, x, y, 0, 0, SIZE, SIZE, SIZE, SIZE);
             g.setColor(1, 1, 1, 1);
-            g.renderFakeItem(advancement.getDisplay().getIcon(), x + 5, y + 5);
+            g.renderFakeItem(advancement.display().get().getIcon(), x + 5, y + 5);
 
             if (overlay != null) {
                 if (advancement == overlay.dragged()) {

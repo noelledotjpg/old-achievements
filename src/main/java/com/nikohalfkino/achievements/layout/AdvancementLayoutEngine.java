@@ -2,6 +2,8 @@ package com.nikohalfkino.achievements.layout;
 
 import com.nikohalfkino.achievements.state.AdvancementStateHelper;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementNode;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
@@ -94,14 +96,18 @@ public class AdvancementLayoutEngine {
                             Map<Advancement, int[]> out) {
         out.put(advancement, new int[]{x, y});
 
-        Random random = new Random(advancement.getId().toString().hashCode());
+        Random random = new Random(advancement.toString().hashCode());
         double spread = Math.toRadians(depth == 0 ? 360 : 160);
         double startAngle = parentAngle - spread / 2.0;
 
         List<Advancement> children = new ArrayList<>();
-        for (Advancement child : advancement.getChildren()) {
-            if (!stateHelper.isHiddenFromScreen(child)) {
-                children.add(child);
+        AdvancementNode advancementNode = Minecraft.getInstance().getConnection().getAdvancements().getTree().nodes().stream().filter(node -> node.holder().value() == advancement).findFirst().orElse(null);
+        if(advancementNode != null) {
+            for (AdvancementNode childNode : advancementNode.children()) {
+                Advancement child = childNode.holder().value();
+                if (!stateHelper.isHiddenFromScreen(child)) {
+                    children.add(child);
+                }
             }
         }
 

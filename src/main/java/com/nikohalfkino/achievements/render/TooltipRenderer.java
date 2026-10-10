@@ -2,14 +2,18 @@ package com.nikohalfkino.achievements.render;
 
 import com.nikohalfkino.achievements.state.AdvancementStateHelper;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementType;
 import net.minecraft.advancements.DisplayInfo;
-import net.minecraft.advancements.FrameType;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 final class TooltipRenderer {
 
@@ -22,31 +26,33 @@ final class TooltipRenderer {
 
     private final Font font;
     private final AdvancementStateHelper stateHelper;
+    private final Function<ResourceLocation, AdvancementHolder> advHolderFunction;
 
-    TooltipRenderer(Font font, AdvancementStateHelper stateHelper) {
+    TooltipRenderer(Font font, AdvancementStateHelper stateHelper, Function<ResourceLocation, AdvancementHolder> advHolderFunction) {
         this.font = font;
         this.stateHelper = stateHelper;
+        this.advHolderFunction = advHolderFunction;
     }
 
     void render(GuiGraphics g, Advancement advancement, int mouseX, int mouseY) {
-        DisplayInfo display = advancement.getDisplay();
+        Optional<DisplayInfo> display = advancement.display();
         boolean done = stateHelper.isUnlocked(advancement);
         boolean available = done || stateHelper.canUnlock(advancement);
-        boolean challenge = display.getFrame() == FrameType.CHALLENGE;
+        boolean challenge = display.get().getType() == AdvancementType.CHALLENGE;
         int depth = stateHelper.getRequirementCount(advancement);
 
         int titleColor = available ? (challenge ? 0xFFFFFF80 : 0xFFFFFFFF) : (challenge ? 0xFF808040 : 0xFF808080);
         String title = (depth == UNKNOWN_TITLE_DEPTH && !available)
                 ? Component.translatable("achievement.unknown").getString()
-                : display.getTitle().getString();
+                : display.get().getTitle().getString();
 
         List<FormattedCharSequence> descriptionLines =
-                available ? font.split(display.getDescription(), DESCRIPTION_WIDTH) : List.of();
+                available ? font.split(display.get().getDescription(), DESCRIPTION_WIDTH) : List.of();
 
         String parentTitle = null;
-        Advancement parent = advancement.getParent();
-        if (parent != null && parent.getDisplay() != null) {
-            parentTitle = parent.getDisplay().getTitle().getString();
+        Advancement parent = advancement.parent().map(advHolderFunction).map(AdvancementHolder::value).orElse(null);
+        if (parent != null && parent.display().isPresent()) {
+            parentTitle = parent.display().map(parentDisplay -> parentDisplay.getTitle().getString()).orElse(null);
         }
         boolean showRequires = !available && parentTitle != null && depth <= UNKNOWN_TITLE_DEPTH;
 

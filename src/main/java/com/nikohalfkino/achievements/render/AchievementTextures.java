@@ -1,5 +1,6 @@
 package com.nikohalfkino.achievements.render;
 
+
 import net.minecraft.resources.ResourceLocation;
 
 public final class AchievementTextures {
@@ -19,6 +20,6 @@ public final class AchievementTextures {
     }
 
     private static ResourceLocation texture(String name) {
-        return new ResourceLocation("minecraft", "textures/gui/achievement/" + name + ".png");
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/achievement/" + name + ".png");
     }
 }

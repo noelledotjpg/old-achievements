@@ -2,7 +2,7 @@ package com.nikohalfkino.achievements.render;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.nikohalfkino.achievements.ClassicAchievementsMod;
+import com.nikohalfkino.achievements.OldAchievements;
 import com.nikohalfkino.achievements.background.BackgroundDefinition;
 import com.nikohalfkino.achievements.background.BackgroundManager;
 import net.minecraft.client.Minecraft;
@@ -14,8 +14,7 @@ import static com.nikohalfkino.achievements.render.BackgroundTileBaker.TILE;
 
 final class BackgroundRenderer {
 
-    private static final ResourceLocation TEXTURE_ID =
-            new ResourceLocation(ClassicAchievementsMod.MODID, "background_baked");
+    private static final ResourceLocation TEXTURE_ID = ResourceLocation.fromNamespaceAndPath(OldAchievements.MODID, "background_baked");
 
     private static final int WORLD_OFFSET = 288;
     private static final int PAD_TILES = 2;
@@ -43,7 +42,7 @@ final class BackgroundRenderer {
                 int viewportW, int viewportH, ResourceLocation rootId) {
         Minecraft mc = Minecraft.getInstance();
         BackgroundDefinition definition = BackgroundManager.get(rootId);
-        int worldSalt = mc.getUser().getUuid().hashCode();
+        int worldSalt = mc.player != null ? mc.player.getUUID().hashCode() : 0;
 
         if (texture == null
                 || viewportW != bakedViewportW || viewportH != bakedViewportH

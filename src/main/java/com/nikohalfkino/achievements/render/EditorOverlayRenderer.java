@@ -2,12 +2,15 @@ package com.nikohalfkino.achievements.render;
 
 import com.nikohalfkino.achievements.state.AdvancementStateHelper;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static com.nikohalfkino.achievements.layout.NodeMetrics.GRID_SIZE;
 
@@ -21,10 +24,12 @@ final class EditorOverlayRenderer {
 
     private final Font font;
     private final AdvancementStateHelper stateHelper;
+    private final Function<ResourceLocation, AdvancementHolder> advHolderFunction;
 
-    EditorOverlayRenderer(Font font, AdvancementStateHelper stateHelper) {
+    EditorOverlayRenderer(Font font, AdvancementStateHelper stateHelper, Function<ResourceLocation, AdvancementHolder> advHolderFunction) {
         this.font = font;
         this.stateHelper = stateHelper;
+        this.advHolderFunction = advHolderFunction;
     }
 
     void renderGrid(GuiGraphics g, TreeView view) {
@@ -41,7 +46,7 @@ final class EditorOverlayRenderer {
         Map<Advancement, int[]> positions = view.positions();
 
         for (Advancement advancement : highlighted) {
-            Advancement parent = advancement.getParent();
+            Advancement parent = advancement.parent().map(advHolderFunction).map(AdvancementHolder::value).orElse(null);
             int[] pos = positions.get(advancement);
             int[] parentPos = parent == null ? null : positions.get(parent);
             if (pos == null || parentPos == null || stateHelper.isHiddenFromScreen(advancement)) continue;

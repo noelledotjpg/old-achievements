@@ -1,15 +1,17 @@
 package com.nikohalfkino.achievements.network;
 
+import com.nikohalfkino.achievements.OldAchievements;
 import com.nikohalfkino.achievements.background.BackgroundManager;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
-public class BackgroundSyncPacket {
+public class BackgroundSyncPacket implements CustomPacketPayload {
 
     private static final int MAX_LEN = 262144;
 
@@ -19,7 +21,16 @@ public class BackgroundSyncPacket {
         this.jsons = jsons;
     }
 
-    public static void encode(BackgroundSyncPacket msg, FriendlyByteBuf buf) {
+    public static final Type<BackgroundSyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(OldAchievements.MODID, "background_sync"));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, BackgroundSyncPacket> STREAM_CODEC = StreamCodec.of(BackgroundSyncPacket::encode, BackgroundSyncPacket::decode);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public static void encode(RegistryFriendlyByteBuf buf, BackgroundSyncPacket msg) {
         buf.writeVarInt(msg.jsons.size());
         msg.jsons.forEach((id, json) -> {
             buf.writeResourceLocation(id);
@@ -27,7 +38,7 @@ public class BackgroundSyncPacket {
         });
     }
 
-    public static BackgroundSyncPacket decode(FriendlyByteBuf buf) {
+    public static BackgroundSyncPacket decode(RegistryFriendlyByteBuf buf) {
         int count = buf.readVarInt();
         Map<ResourceLocation, String> jsons = new HashMap<>();
         for (int i = 0; i < count; i++) {
@@ -37,8 +48,7 @@ public class BackgroundSyncPacket {
         return new BackgroundSyncPacket(jsons);
     }
 
-    public static void handle(BackgroundSyncPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> BackgroundManager.setSynced(msg.jsons));
-        ctx.get().setPacketHandled(true);
+    public static void handle(BackgroundSyncPacket msg, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> BackgroundManager.setSynced(msg.jsons));
     }
 }

@@ -5,13 +5,13 @@ import com.nikohalfkino.achievements.screen.LegacyAchievementScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 
-@Mod.EventBusSubscriber(modid = ClassicAchievementsMod.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class ClientEventHandler {
 
     @SubscribeEvent

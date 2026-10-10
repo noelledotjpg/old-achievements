@@ -2,7 +2,7 @@ package com.nikohalfkino.achievements.layout;
 
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.nikohalfkino.achievements.ClassicAchievementsMod;
+import com.nikohalfkino.achievements.OldAchievements;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,22 +33,22 @@ final class LayoutFile {
                 if (key.startsWith(LEGACY_EDGE_PREFIX)) continue; // legacy waypoint sections
 
                 if (!(entry.getValue() instanceof Config section)) {
-                    ClassicAchievementsMod.LOGGER.warn("Unexpected entry type for key '{}', skipping", key);
+                    OldAchievements.LOGGER.warn("Unexpected entry type for key '{}', skipping", key);
                     continue;
                 }
 
                 Object x = section.valueMap().get("x");
                 Object y = section.valueMap().get("y");
                 if (!(x instanceof Number) || !(y instanceof Number)) {
-                    ClassicAchievementsMod.LOGGER.warn("Missing or non-numeric x/y for key '{}', skipping", key);
+                    OldAchievements.LOGGER.warn("Missing or non-numeric x/y for key '{}', skipping", key);
                     continue;
                 }
                 positions.put(key, new int[]{((Number) x).intValue(), ((Number) y).intValue()});
             }
 
-            ClassicAchievementsMod.LOGGER.info("Loaded {} layout overrides from {}", positions.size(), path.getFileName());
+            OldAchievements.LOGGER.info("Loaded {} layout overrides from {}", positions.size(), path.getFileName());
         } catch (Exception e) {
-            ClassicAchievementsMod.LOGGER.warn("Failed to read layout config, starting fresh: {}", e.getMessage());
+            OldAchievements.LOGGER.warn("Failed to read layout config, starting fresh: {}", e.getMessage());
             positions.clear();
         }
         return positions;
@@ -79,9 +79,9 @@ final class LayoutFile {
             }
 
             Files.writeString(path, sb.toString(), StandardCharsets.UTF_8);
-            ClassicAchievementsMod.LOGGER.info("Wrote {} layout entries to {}", positions.size(), path.getFileName());
+            OldAchievements.LOGGER.info("Wrote {} layout entries to {}", positions.size(), path.getFileName());
         } catch (IOException e) {
-            ClassicAchievementsMod.LOGGER.error("Failed to write layout config: {}", e.getMessage());
+            OldAchievements.LOGGER.error("Failed to write layout config: {}", e.getMessage());
         }
     }
 

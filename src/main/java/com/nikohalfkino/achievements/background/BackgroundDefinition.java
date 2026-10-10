@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,10 +82,10 @@ public final class BackgroundDefinition {
 
     private static Block block(String id, int layerIndex) {
         ResourceLocation location = ResourceLocation.tryParse(id);
-        if (location == null || !ForgeRegistries.BLOCKS.containsKey(location)) {
+        if (location == null || !BuiltInRegistries.BLOCK.containsKey(location)) {
             throw new JsonParseException("layers[" + layerIndex + "]: unknown block '" + id + "'");
         }
-        return ForgeRegistries.BLOCKS.getValue(location);
+        return BuiltInRegistries.BLOCK.get(location);
     }
 
     private static Range range(JsonObject json, String key) {
@@ -113,7 +113,7 @@ public final class BackgroundDefinition {
             if (!layer.depth().contains(depth) || !layer.row().contains(tileY)) continue;
             if (layer.chance() < 1F && random.nextFloat() >= layer.chance()) continue;
             List<Block> blocks = layer.blocks();
-            return blocks.size() == 1 ? blocks.get(0) : blocks.get(random.nextInt(blocks.size()));
+            return blocks.size() == 1 ? blocks.getFirst() : blocks.get(random.nextInt(blocks.size()));
         }
         return null;
     }

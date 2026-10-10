@@ -2,7 +2,7 @@ package com.nikohalfkino.achievements.background;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.nikohalfkino.achievements.ClassicAchievementsMod;
+import com.nikohalfkino.achievements.OldAchievements;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.InputStream;
@@ -38,7 +38,7 @@ public final class BackgroundManager {
                 parsed.put(entry.getKey(), BackgroundDefinition.parse(
                         JsonParser.parseString(entry.getValue()).getAsJsonObject()));
             } catch (Exception e) {
-                ClassicAchievementsMod.LOGGER.error("Invalid synced achievement background {}", entry.getKey(), e);
+                OldAchievements.LOGGER.error("Invalid synced achievement background {}", entry.getKey(), e);
             }
         }
         synced = parsed;
@@ -55,7 +55,7 @@ public final class BackgroundManager {
                 JsonObject json = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
                 bundled = BackgroundDefinition.parse(json);
             } catch (Exception e) {
-                ClassicAchievementsMod.LOGGER.error("Failed to load bundled achievement background", e);
+                OldAchievements.LOGGER.error("Failed to load bundled achievement background", e);
                 bundled = BackgroundDefinition.parse(JsonParser.parseString(FALLBACK_JSON).getAsJsonObject());
             }
         }

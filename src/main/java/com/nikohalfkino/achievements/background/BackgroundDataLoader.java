@@ -3,7 +3,7 @@ package com.nikohalfkino.achievements.background;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.nikohalfkino.achievements.ClassicAchievementsMod;
+import com.nikohalfkino.achievements.OldAchievements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class BackgroundDataLoader extends SimpleJsonResourceReloadListener {
 
-    public static final ResourceLocation DEFAULT_ID = new ResourceLocation(ClassicAchievementsMod.MODID, "default");
+    public static final ResourceLocation DEFAULT_ID = ResourceLocation.fromNamespaceAndPath(OldAchievements.MODID, "default");
 
     private static final Gson GSON = new GsonBuilder().setLenient().create();
 
@@ -36,7 +36,7 @@ public class BackgroundDataLoader extends SimpleJsonResourceReloadListener {
                 BackgroundDefinition.parse(entry.getValue().getAsJsonObject()); // validate only
                 valid.put(entry.getKey(), entry.getValue().toString());
             } catch (Exception e) {
-                ClassicAchievementsMod.LOGGER.error("Invalid achievement background {}: {}", entry.getKey(), e.getMessage());
+                OldAchievements.LOGGER.error("Invalid achievement background {}: {}", entry.getKey(), e.getMessage());
             }
         }
         activeJsons = Map.copyOf(valid);

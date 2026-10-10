@@ -1,6 +1,6 @@
 package com.nikohalfkino.achievements.screen;
 
-import com.nikohalfkino.achievements.ClassicAchievementsConfig;
+import com.nikohalfkino.achievements.OldAchievementsConfig;
 import com.nikohalfkino.achievements.layout.AdvancementLayoutConfig;
 import com.nikohalfkino.achievements.layout.AdvancementLayoutEngine;
 import com.nikohalfkino.achievements.render.EditorOverlay;
@@ -46,7 +46,7 @@ final class NodeEditor {
     }
 
     boolean isActive() {
-        return ClassicAchievementsConfig.DEBUG_MODE.get() && enabled;
+        return OldAchievementsConfig.DEBUG_MODE.get() && enabled;
     }
 
     void toggle() {

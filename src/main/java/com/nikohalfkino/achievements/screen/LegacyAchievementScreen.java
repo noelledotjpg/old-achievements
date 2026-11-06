@@ -210,6 +210,7 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        renderBackground(g, mouseX, mouseY, partialTick);
         scroll.animate();
         FrameGeometry frame = frame();
 
@@ -218,7 +219,9 @@ public class LegacyAchievementScreen extends Screen implements ClientAdvancement
 
         g.pose().pushPose();
         g.pose().translate(0, 0, 210);
-        super.render(g, mouseX, mouseY, partialTick);
+        for (var renderable : renderables) {
+            renderable.render(g, mouseX, mouseY, partialTick);
+        }
         g.pose().popPose();
 
         if (editor.isActive() && !editor.isSnapEnabled()) {
